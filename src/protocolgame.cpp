@@ -1629,14 +1629,13 @@ void ProtocolGame::sendContainer(uint8_t cid, const Container* container, bool h
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendShop(Npc* npc, const ShopInfoList& itemList)
+void ProtocolGame::sendShop(const ShopInfoList& itemList)
 {
 	NetworkMessage msg;
 	msg.addByte(0x7A);
-	msg.addString(npc->getName());
 
 	uint16_t itemsToSend = std::min<size_t>(itemList.size(), std::numeric_limits<uint16_t>::max());
-	msg.add<uint16_t>(itemsToSend);
+	msg.addByte(itemsToSend);
 
 	uint16_t i = 0;
 	for (auto it = itemList.begin(); i < itemsToSend; ++it, ++i) {
@@ -1657,7 +1656,7 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 {
 	NetworkMessage msg;
 	msg.addByte(0x7B);
-	msg.add<uint64_t>(player->getMoney() + player->getBankBalance());
+	msg.add<uint32_t>(player->getMoney());
 
 	std::map<uint16_t, uint32_t> saleMap;
 
@@ -1680,7 +1679,8 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 				saleMap[shopInfo.itemId] = count;
 			}
 		}
-	} else {
+	}
+	else {
 		// Large shop, it's better to get a cached map of all item counts and use it
 		// We need a temporary map since the finished map should only contain items
 		// available in the shop
@@ -1706,14 +1706,16 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 				uint32_t count;
 				if (itemType.isFluidContainer() || itemType.isSplash()) {
 					count = player->getItemTypeCount(shopInfo.itemId, subtype); // This shop item requires extra checks
-				} else {
+				}
+				else {
 					count = subtype;
 				}
 
 				if (count > 0) {
 					saleMap[shopInfo.itemId] = count;
 				}
-			} else {
+			}
+			else {
 				std::map<uint32_t, uint32_t>::const_iterator findIt = tempSaleMap.find(shopInfo.itemId);
 				if (findIt != tempSaleMap.end() && findIt->second > 0) {
 					saleMap[shopInfo.itemId] = findIt->second;

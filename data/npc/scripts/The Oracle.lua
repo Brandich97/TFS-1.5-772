@@ -33,16 +33,16 @@ local function creatureSayCallback(cid, type, msg)
 	end
 
 	if msgcontains(msg, "yes") and npcHandler.topic[cid] == 0 then
-		npcHandler:say("IN WHICH TOWN DO YOU WANT TO LIVE: {RHYVES}?", cid)
+		npcHandler:say("IN WHICH TOWN DO YOU WANT TO LIVE: {THAIS}?", cid)
 		npcHandler.topic[cid] = 1
 	elseif npcHandler.topic[cid] == 1 then
-		if msgcontains(msg, "rhyves") then
-			town[cid] = 2
-			destination[cid] = Position(159, 387, 6)
+		if msgcontains(msg, "thais") then
+			town[cid] = 3
+			destination[cid] = Position(32369, 32241, 7)
 			npcHandler:say("IN RHYVES! AND WHAT PROFESSION HAVE YOU CHOSEN: {KNIGHT}, {PALADIN}, {SORCERER}, OR {DRUID}?", cid)
 			npcHandler.topic[cid] = 2
 		else
-			npcHandler:say("IN WHICH TOWN DO YOU WANT TO LIVE: {RHYVES}?", cid)
+			npcHandler:say("IN WHICH TOWN DO YOU WANT TO LIVE: {THAIS}?", cid)
 		end
 	elseif npcHandler.topic[cid] == 2 then
 		if msgcontains(msg, "sorcerer") then

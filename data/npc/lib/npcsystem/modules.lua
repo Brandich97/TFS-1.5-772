@@ -14,7 +14,9 @@ if Modules == nil then
 
 	-- Pattern used to get the amount of an item a player wants to buy/sell.
 	PATTERN_COUNT = "%d+"
-
+	
+	
+	ITEM_SHOPPING_BAG = 1998
 	-- Constants used to separate buying from selling.
 	SHOPMODULE_SELL_ITEM = 1
 	SHOPMODULE_BUY_ITEM = 2
@@ -26,7 +28,7 @@ if Modules == nil then
 	SHOPMODULE_MODE_BOTH = 3 -- Both working at one time
 
 	-- Used shop mode
-	SHOPMODULE_MODE = SHOPMODULE_MODE_TALK
+	SHOPMODULE_MODE = SHOPMODULE_MODE_BOTH
 
 	Modules = {
 		parseableModules = {}
