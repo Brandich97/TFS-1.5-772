@@ -1034,6 +1034,9 @@ class LuaScriptInterface
 
 		static int luaPlayerGetStoreInbox(lua_State* L);
 
+ 		
+ 		static int luaPlayerOpenMarket(lua_State* L);
+
 		// Monster
 		static int luaMonsterCreate(lua_State* L);
 

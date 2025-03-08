@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * The Forgotten Server - a free and open-source MMORPG server emulator
  * Copyright (C) 2019  Mark Samman <mark.samman@gmail.com>
@@ -16,6 +17,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+=======
+// Copyright 2022 The Forgotten Server Authors. All rights reserved.
+// Use of this source code is governed by the GPL-2.0 License that can be found in the LICENSE file.
+>>>>>>> 04a30ef (Market feature added)
 
 #include "otpch.h"
 
@@ -49,6 +54,10 @@ MarketOfferList IOMarket::getActiveOffers(MarketAction_t action, uint16_t itemId
 		offer.price = result->getNumber<uint32_t>("price");
 		offer.timestamp = result->getNumber<uint32_t>("created") + marketOfferDuration;
 		offer.counter = result->getNumber<uint32_t>("id") & 0xFFFF;
+<<<<<<< HEAD
+=======
+		offer.itemId = itemId;
+>>>>>>> 04a30ef (Market feature added)
 		if (result->getNumber<uint16_t>("anonymous") == 0) {
 			offer.playerName = result->getString("player_name");
 		} else {
@@ -112,6 +121,7 @@ HistoryMarketOfferList IOMarket::getOwnHistory(MarketAction_t action, uint32_t p
 
 void IOMarket::processExpiredOffers(DBResult_ptr result, bool)
 {
+<<<<<<< HEAD
 	if (!result) {
 		return;
 	}
@@ -182,6 +192,78 @@ void IOMarket::processExpiredOffers(DBResult_ptr result, bool)
 			}
 		}
 	} while (result->next());
+=======
+    if (!result) {
+        return;
+    }
+
+    do {
+        if (!IOMarket::moveOfferToHistory(result->getNumber<uint32_t>("id"), OFFERSTATE_EXPIRED)) {
+            continue;
+        }
+
+        const uint32_t playerId = result->getNumber<uint32_t>("player_id");
+        const uint16_t amount = result->getNumber<uint16_t>("amount");
+        if (result->getNumber<uint16_t>("sale") == 1) {
+            const ItemType& itemType = Item::items[result->getNumber<uint16_t>("itemtype")];
+            if (itemType.id == 0) {
+                continue;
+            }
+
+            Player* player = g_game.getPlayerByGUID(playerId);
+            if (!player) {
+                player = new Player(nullptr);
+                if (!IOLoginData::loadPlayerById(player, playerId)) {
+                    delete player;
+                    continue;
+                }
+            }
+
+            if (itemType.stackable) {
+                uint16_t tmpAmount = amount;
+                while (tmpAmount > 0) {
+                    uint16_t stackCount = std::min<uint16_t>(100, tmpAmount);
+                    Item* item = Item::CreateItem(itemType.id, stackCount);
+                    if (g_game.internalAddItem(player->getInbox().get(), item, INDEX_WHEREEVER, FLAG_NOLIMIT) != RETURNVALUE_NOERROR) {
+                        delete item;
+                        break;
+                    }
+
+                    tmpAmount -= stackCount;
+                }
+            } else {
+                int32_t subType;
+                if (itemType.charges != 0) {
+                    subType = itemType.charges;
+                } else {
+                    subType = -1;
+                }
+
+                for (uint16_t i = 0; i < amount; ++i) {
+                    Item* item = Item::CreateItem(itemType.id, subType);
+                    if (g_game.internalAddItem(player->getInbox().get(), item, INDEX_WHEREEVER, FLAG_NOLIMIT) != RETURNVALUE_NOERROR) {
+                        delete item;
+                        break;
+                    }
+                }
+            }
+
+            if (player->isOffline()) {
+                IOLoginData::savePlayer(player);
+                delete player;
+            }
+        } else {
+            uint64_t totalPrice = result->getNumber<uint64_t>("price") * amount;
+
+            Player* player = g_game.getPlayerByGUID(playerId);
+            if (player) {
+                player->setBankBalance(player->getBankBalance() + totalPrice);
+            } else {
+                IOLoginData::increaseBankBalance(playerId, totalPrice);
+            }
+        }
+    } while (result->next());
+>>>>>>> 04a30ef (Market feature added)
 }
 
 void IOMarket::checkExpiredOffers()

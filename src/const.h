@@ -20,9 +20,15 @@
 #ifndef FS_CONST_H_0A49B5996F074465BF44B90F4F780E8B
 #define FS_CONST_H_0A49B5996F074465BF44B90F4F780E8B
 
+<<<<<<< HEAD
 static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 24590;
+=======
+static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 65500;
+static constexpr int32_t MIN_MARKET_FEE = 20;
+ static constexpr int32_t MAX_MARKET_FEE = 10000;
+>>>>>>> 04a30ef (Market feature added)
 
-enum MagicEffectClasses : uint8_t {
+enum MagicEffectClasses : uint16_t {
 	CONST_ME_NONE,
 
 	CONST_ME_DRAWBLOOD = 1,
