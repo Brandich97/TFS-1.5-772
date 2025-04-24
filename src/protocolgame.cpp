@@ -2471,7 +2471,7 @@ void ProtocolGame::sendAddTileItem(const Position& pos, uint32_t, const Item* it
 	msg.addByte(0x6A);
 	msg.addPosition(pos);
 	//msg.addByte(stackpos);
-	msg.addItem(item, otclientV8);
+	msg.addItem(item);
 	writeToOutputBuffer(msg);
 }
 
