@@ -95,7 +95,7 @@ void NetworkMessage::addPosition(const Position& pos)
 	addByte(pos.z);
 }
 
-void NetworkMessage::addItem(uint16_t id, uint8_t count)
+void NetworkMessage::addItem(uint16_t id, uint8_t count, bool withDescription)
 {
 	const ItemType& it = Item::items[id];
 
@@ -105,6 +105,10 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 
 	if (it.stackable || it.isSplash() || it.isFluidContainer()) {
 		addByte(count);
+	}
+
+	if (withDescription) {
+		addString("");
 	}
 
 	/*if (it.stackable) {
@@ -118,7 +122,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	}*/
 }
 
-void NetworkMessage::addItem(const Item* item)
+void NetworkMessage::addItem(const Item* item, bool withDescription)
 {
 	const ItemType& it = Item::items[item->getID()];
 
@@ -139,6 +143,10 @@ void NetworkMessage::addItem(const Item* item)
 		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(item->getSubType());
+	}
+
+	if (withDescription) {
+		addString(item->getDescription(0));
 	}
 }
 
