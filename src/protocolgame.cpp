@@ -1599,11 +1599,10 @@ void ProtocolGame::sendChannelMessage(const std::string& author, const std::stri
 
 void ProtocolGame::sendIcons(uint16_t icons)
 {
-	NetworkMessage msg;
-	msg.addByte(0xA2);
-	//msg.add<uint16_t>(icons);
-	msg.addByte(icons);
-	writeToOutputBuffer(msg);
+    NetworkMessage msg;
+    msg.addByte(0xA2);
+    msg.add<uint16_t>(icons);
+    writeToOutputBuffer(msg);
 }
 
 void ProtocolGame::sendContainer(uint8_t cid, const Container* container, bool hasParent, uint16_t firstIndex)

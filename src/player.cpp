@@ -407,7 +407,7 @@ uint16_t Player::getClientIcons() const
 		icons |= ICON_REDSWORDS;
 	}
 
-	/*
+	
 	if (tile && tile->hasFlag(TILESTATE_PROTECTIONZONE)) {
 		icons |= ICON_PIGEON;
 
@@ -415,7 +415,7 @@ uint16_t Player::getClientIcons() const
 		if (hasBitSet(ICON_SWORDS, icons)) {
 			icons &= ~ICON_SWORDS;
 		}
-	}*/
+	}
 
 	// Game client debugs with 10 or more icons
 	// so let's prevent that from happening.
