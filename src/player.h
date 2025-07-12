@@ -249,19 +249,9 @@ class Player final : public Creature, public Cylinder
 			lastWalkthroughPosition = walkthroughPosition;
 		}
 
-<<<<<<< HEAD
 		Inbox* getInbox() const {
 			return inbox;
 		}
-=======
-		Inbox_ptr getInbox() const
-			{
-				if (!inbox) {
-					const_cast<Player*>(this)->inbox = std::make_shared<Inbox>(ITEM_INBOX);
-				}
-				return inbox;
-			}
->>>>>>> 04a30ef (Market feature added)
 
 		StoreInbox* getStoreInbox() const {
 			return storeInbox;
@@ -374,7 +364,6 @@ class Player final : public Creature, public Cylinder
 		bool isInMarket() const {
 			return inMarket;
 		}
-<<<<<<< HEAD
 
 		void resetIdleTime() {
 			idleTime = 0;
@@ -383,14 +372,6 @@ class Player final : public Creature, public Cylinder
 		bool isInGhostMode() const override {
 			return ghostMode;
 		}
-=======
-		
-		int32_t getIdleTime() const { return idleTime; }
-		void setIdleTime(int32_t time) { idleTime = time; }
-		void resetIdleTime() { idleTime = 0; }
-		
-		bool isInGhostMode() const override { return ghostMode; }
->>>>>>> 04a30ef (Market feature added)
 		bool canSeeGhostMode(const Creature* creature) const override;
 		void switchGhostMode() {
 			ghostMode = !ghostMode;
@@ -1031,7 +1012,6 @@ class Player final : public Creature, public Cylinder
 				client->sendCloseShop();
 			}
 		}
-<<<<<<< HEAD
 		void sendMarketEnter(uint32_t depotId) const {
 			if (client) {
 				client->sendMarketEnter(depotId);
@@ -1041,11 +1021,6 @@ class Player final : public Creature, public Cylinder
 			inMarket = false;
 			if (client) {
 				client->sendMarketLeave();
-=======
-		void sendMarketEnter() const {
-			if (client) {
-				client->sendMarketEnter();
->>>>>>> 04a30ef (Market feature added)
 			}
 		}
 		void sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers, const MarketOfferList& sellOffers) const {

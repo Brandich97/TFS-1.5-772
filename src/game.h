@@ -420,25 +420,10 @@ class Game
 		void playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter);
 		void playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
 
-		void playerLeaveMarket(uint32_t playerId);
-		void playerBrowseMarket(uint32_t playerId, uint16_t spriteId);
-		void playerBrowseMarketOwnOffers(uint32_t playerId);
-		void playerBrowseMarketOwnHistory(uint32_t playerId);
-		void playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spriteId, uint16_t amount, uint32_t price, bool anonymous);
-		void playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter);
-		void playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
-
 		void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer);
-<<<<<<< HEAD
 
 		//std::forward_list<Item*> getMarketItemList(uint16_t wareId, uint16_t sufficientCount, DepotChest* depotChest, Inbox* inbox);
 
-=======
-		void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage* msg);
-
-		std::forward_list<Item*> getMarketItemList(uint16_t wareId, uint16_t sufficientCount, const Player& player);
-		
->>>>>>> 04a30ef (Market feature added)
 		void cleanup();
 		void shutdown();
 		void ReleaseCreature(Creature* creature);

@@ -30,10 +30,6 @@
 #include "game.h"
 #include "iologindata.h"
 #include "iomarket.h"
-<<<<<<< HEAD
-=======
-#include "waitlist.h"
->>>>>>> 04a30ef (Market feature added)
 #include "ban.h"
 #include "scheduler.h"
 
@@ -157,6 +153,18 @@ void ProtocolGame::release()
 
 void ProtocolGame::login(const std::string& name, uint32_t accountId, OperatingSystem_t operatingSystem)
 {
+
+	// OTCv8 features and extended opcodes
+	if (otclientV8 || operatingSystem >= CLIENTOS_OTCLIENT_LINUX) {
+		if(otclientV8)
+			sendFeatures();
+		NetworkMessage opcodeMessage;
+		opcodeMessage.addByte(0x32);
+		opcodeMessage.addByte(0x00);
+		opcodeMessage.add<uint16_t>(0x00);
+		writeToOutputBuffer(opcodeMessage);
+	}
+
 	//dispatcher thread
 	Player* foundPlayer = g_game.getPlayerByName(name);
 	if (!foundPlayer || g_config.getBoolean(ConfigManager::ALLOW_CLONES)) {
@@ -361,6 +369,14 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 		writeToOutputBuffer(opcodeMessage);
 	}
 
+	if (operatingSystem >= CLIENTOS_OTCLIENT_LINUX) {
+		NetworkMessage opcodeMessage;
+		opcodeMessage.addByte(0x32);
+		opcodeMessage.addByte(0x00);
+		opcodeMessage.add<uint16_t>(0x00);
+		writeToOutputBuffer(opcodeMessage);
+	}
+
 	msg.skipBytes(1); // gamemaster flag
 
 	/*std::string sessionKey = msg.getString();
@@ -409,6 +425,12 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 		disconnect();
 		return;
 	}*/
+
+	// OTCv8 version detection
+	uint16_t otcV8StringLength = msg.get<uint16_t>();
+	if(otcV8StringLength == 5 && msg.getString(5) == "OTCv8") {
+		otclientV8 = msg.get<uint16_t>(); // 253, 260, 261, ...
+	}
 
 	if (version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX) {
 		disconnectClient(fmt::format("Only clients with protocol {:s} allowed!", CLIENT_VERSION_STR));
@@ -592,20 +614,12 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0xF1: parseQuestLine(msg); break;
 		case 0xF2: parseRuleViolationReport(msg); break;
 		case 0xF3: /* get object info */ break;
-<<<<<<< HEAD
 		/*case 0xF4: parseMarketLeave(); break;
-=======
-		case 0xF9: parseModalWindowAnswer(msg); break;
-		case 0xF4: parseMarketLeave(); break;
->>>>>>> 04a30ef (Market feature added)
 		case 0xF5: parseMarketBrowse(msg); break;
 		case 0xF6: parseMarketCreateOffer(msg); break;
 		case 0xF7: parseMarketCancelOffer(msg); break;
 		case 0xF8: parseMarketAcceptOffer(msg); break;
-<<<<<<< HEAD
 		case 0xF9: parseModalWindowAnswer(msg); break;*/
-=======
->>>>>>> 04a30ef (Market feature added)
 
 		default:
 			// std::cout << "Player: " << player->getName() << " sent an unknown packet header: 0x" << std::hex << static_cast<uint16_t>(recvbyte) << std::dec << "!" << std::endl;
@@ -1203,7 +1217,6 @@ void ProtocolGame::parseEnableSharedPartyExperience(NetworkMessage& msg)
 	addGameTask(&Game::playerEnableSharedPartyExperience, player->getID(), sharedExpActive);
 }
 
-<<<<<<< HEAD
 void ProtocolGame::parseQuestLine(NetworkMessage& msg)
 {
 	uint16_t questId = msg.get<uint16_t>();
@@ -1211,8 +1224,6 @@ void ProtocolGame::parseQuestLine(NetworkMessage& msg)
 }
 
 /*
-=======
->>>>>>> 04a30ef (Market feature added)
 void ProtocolGame::parseMarketLeave()
 {
 	addGameTask(&Game::playerLeaveMarket, player->getID());
@@ -1588,11 +1599,10 @@ void ProtocolGame::sendChannelMessage(const std::string& author, const std::stri
 
 void ProtocolGame::sendIcons(uint16_t icons)
 {
-	NetworkMessage msg;
-	msg.addByte(0xA2);
-	//msg.add<uint16_t>(icons);
-	msg.addByte(icons);
-	writeToOutputBuffer(msg);
+    NetworkMessage msg;
+    msg.addByte(0xA2);
+    msg.add<uint16_t>(icons);
+    writeToOutputBuffer(msg);
 }
 
 void ProtocolGame::sendContainer(uint8_t cid, const Container* container, bool hasParent, uint16_t firstIndex)
@@ -1610,7 +1620,7 @@ void ProtocolGame::sendContainer(uint8_t cid, const Container* container, bool h
 		msg.addString(container->getName());
 	}*/
 
-	msg.addItem(container);
+	msg.addItem(container, otclientV8);
 	msg.addString(container->getName());
 
 	msg.addByte(container->capacity());
@@ -1622,7 +1632,7 @@ void ProtocolGame::sendContainer(uint8_t cid, const Container* container, bool h
 	uint32_t i = 0;
 	const ItemDeque& itemList = container->getItemList();
 	for (ItemDeque::const_iterator it = itemList.begin() + firstIndex, end = itemList.end(); i < 0xFF && it != end; ++it, ++i) {
-		msg.addItem(*it);
+		msg.addItem(*it, otclientV8);
 	}
 
 	/*msg.addByte(container->isUnlocked() ? 0x01 : 0x00); // Drag and drop
@@ -1751,7 +1761,6 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 	writeToOutputBuffer(msg);
 }
 
-<<<<<<< HEAD
 /*
 void ProtocolGame::sendMarketEnter(uint32_t depotId)
 {
@@ -1822,115 +1831,18 @@ void ProtocolGame::sendMarketLeave()
 }
 
 void ProtocolGame::sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers, const MarketOfferList& sellOffers)
-=======
-void ProtocolGame::sendMarketEnter()
-{
-    NetworkMessage msg;
-    msg.addByte(0xF6); // Market Enter opcode
-    
-    // Balance for 8.60 client (U32)
-    uint32_t bankBalance = static_cast<uint32_t>(std::min<uint64_t>(player->getBankBalance(), std::numeric_limits<uint32_t>::max()));
-    msg.add<uint32_t>(bankBalance);
-    
-    // Vocation (required for 8.60 <= protocol < 950)
-    msg.addByte(player->getVocation()->getClientId());
-    
-    // Player offers
-    msg.addByte(std::min<uint32_t>(IOMarket::getPlayerOfferCount(player->getGUID()), std::numeric_limits<uint8_t>::max()));
-    
-    player->setInMarket(true);
-
-    // Collect depot items for market
-    std::map<uint16_t, uint32_t> depotItems;
-    std::forward_list<Container*> containerList{player->getInbox().get()}; // Corrigido aqui
-    
-    // Add depot chests
-    for (const auto& chest : player->depotChests) {
-        if (Container* container = dynamic_cast<Container*>(chest.second.get())) {
-            if (!container->empty()) {
-                containerList.push_front(container);
-            }
-        }
-    }
-
-    // Process all containers
-    while (!containerList.empty()) {
-        Container* container = containerList.front();
-        containerList.pop_front();
-
-        if (!container) {
-            continue;
-        }
-
-        for (Item* item : container->getItemList()) {
-            if (!item) {
-                continue;
-            }
-
-            Container* containerItem = item->getContainer();
-            if (containerItem && !containerItem->empty()) {
-                containerList.push_front(containerItem);
-                continue;
-            }
-
-            const ItemType& itemType = Item::items[item->getID()];
-            
-            // Check if item can be traded in market
-            if (itemType.wareId == 0 || 
-                (containerItem && (!itemType.isContainer() || containerItem->capacity() != itemType.maxItems)) || 
-                !item->hasMarketAttributes()) {
-                continue;
-            }
-
-            depotItems[itemType.id] += Item::countByType(item, -1);
-        }
-    }
-
-    // Add number of items and the items themselves
-    uint16_t itemsToSend = std::min<size_t>(depotItems.size(), std::numeric_limits<uint16_t>::max());
-    msg.add<uint16_t>(itemsToSend);
-    
-    uint16_t count = 0;
-    for (const auto& [itemId, itemCount] : depotItems) {
-        if (count >= itemsToSend) {
-            break;
-        }
-        
-        const ItemType& itemType = Item::items[itemId];
-        msg.add<uint16_t>(itemType.wareId);
-        msg.add<uint16_t>(std::min<uint32_t>(0xFFFF, itemCount));
-        count++;
-    }
-    
-    writeToOutputBuffer(msg);
-}
-
-void ProtocolGame::sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers,
-	const MarketOfferList& sellOffers)
->>>>>>> 04a30ef (Market feature added)
 {
 	NetworkMessage msg;
 
 	msg.addByte(0xF9);
 	msg.addItemId(itemId);
 
-<<<<<<< HEAD
-=======
-	if (Item::items[itemId].classification > 0) {
-		msg.addByte(0); // item tier
-	}
-
->>>>>>> 04a30ef (Market feature added)
 	msg.add<uint32_t>(buyOffers.size());
 	for (const MarketOffer& offer : buyOffers) {
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.add<uint16_t>(offer.amount);
-<<<<<<< HEAD
 		msg.add<uint32_t>(offer.price);
-=======
-		msg.add<uint64_t>(offer.price);
->>>>>>> 04a30ef (Market feature added)
 		msg.addString(offer.playerName);
 	}
 
@@ -1939,11 +1851,7 @@ void ProtocolGame::sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& 
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.add<uint16_t>(offer.amount);
-<<<<<<< HEAD
 		msg.add<uint32_t>(offer.price);
-=======
-		msg.add<uint64_t>(offer.price);
->>>>>>> 04a30ef (Market feature added)
 		msg.addString(offer.playerName);
 	}
 
@@ -1956,23 +1864,12 @@ void ProtocolGame::sendMarketAcceptOffer(const MarketOfferEx& offer)
 	msg.addByte(0xF9);
 	msg.addItemId(offer.itemId);
 
-<<<<<<< HEAD
-=======
-	if (Item::items[offer.itemId].classification > 0) {
-		msg.addByte(0);
-	}
-
->>>>>>> 04a30ef (Market feature added)
 	if (offer.type == MARKETACTION_BUY) {
 		msg.add<uint32_t>(0x01);
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.add<uint16_t>(offer.amount);
-<<<<<<< HEAD
 		msg.add<uint32_t>(offer.price);
-=======
-		msg.add<uint64_t>(offer.price);
->>>>>>> 04a30ef (Market feature added)
 		msg.addString(offer.playerName);
 		msg.add<uint32_t>(0x00);
 	} else {
@@ -1981,11 +1878,7 @@ void ProtocolGame::sendMarketAcceptOffer(const MarketOfferEx& offer)
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.add<uint16_t>(offer.amount);
-<<<<<<< HEAD
 		msg.add<uint32_t>(offer.price);
-=======
-		msg.add<uint64_t>(offer.price);
->>>>>>> 04a30ef (Market feature added)
 		msg.addString(offer.playerName);
 	}
 
@@ -2003,12 +1896,6 @@ void ProtocolGame::sendMarketBrowseOwnOffers(const MarketOfferList& buyOffers, c
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.addItemId(offer.itemId);
-<<<<<<< HEAD
-=======
-		if (Item::items[offer.itemId].classification > 0) {
-			msg.addByte(0);
-		}
->>>>>>> 04a30ef (Market feature added)
 		msg.add<uint16_t>(offer.amount);
 		msg.add<uint32_t>(offer.price);
 	}
@@ -2018,12 +1905,6 @@ void ProtocolGame::sendMarketBrowseOwnOffers(const MarketOfferList& buyOffers, c
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.addItemId(offer.itemId);
-<<<<<<< HEAD
-=======
-		if (Item::items[offer.itemId].classification > 0) {
-			msg.addByte(0);
-		}
->>>>>>> 04a30ef (Market feature added)
 		msg.add<uint16_t>(offer.amount);
 		msg.add<uint32_t>(offer.price);
 	}
@@ -2042,12 +1923,6 @@ void ProtocolGame::sendMarketCancelOffer(const MarketOfferEx& offer)
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.addItemId(offer.itemId);
-<<<<<<< HEAD
-=======
-		if (Item::items[offer.itemId].classification > 0) {
-			msg.addByte(0);
-		}
->>>>>>> 04a30ef (Market feature added)
 		msg.add<uint16_t>(offer.amount);
 		msg.add<uint32_t>(offer.price);
 		msg.add<uint32_t>(0x00);
@@ -2057,12 +1932,6 @@ void ProtocolGame::sendMarketCancelOffer(const MarketOfferEx& offer)
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.addItemId(offer.itemId);
-<<<<<<< HEAD
-=======
-		if (Item::items[offer.itemId].classification > 0) {
-			msg.addByte(0);
-		}
->>>>>>> 04a30ef (Market feature added)
 		msg.add<uint16_t>(offer.amount);
 		msg.add<uint32_t>(offer.price);
 	}
@@ -2086,12 +1955,6 @@ void ProtocolGame::sendMarketBrowseOwnHistory(const HistoryMarketOfferList& buyO
 		msg.add<uint32_t>(it->timestamp);
 		msg.add<uint16_t>(counterMap[it->timestamp]++);
 		msg.addItemId(it->itemId);
-<<<<<<< HEAD
-=======
-		if (Item::items[it->itemId].classification > 0) {
-			msg.addByte(0);
-		}
->>>>>>> 04a30ef (Market feature added)
 		msg.add<uint16_t>(it->amount);
 		msg.add<uint32_t>(it->price);
 		msg.addByte(it->state);
@@ -2105,12 +1968,6 @@ void ProtocolGame::sendMarketBrowseOwnHistory(const HistoryMarketOfferList& buyO
 		msg.add<uint32_t>(it->timestamp);
 		msg.add<uint16_t>(counterMap[it->timestamp]++);
 		msg.addItemId(it->itemId);
-<<<<<<< HEAD
-=======
-		if (Item::items[it->itemId].classification > 0) {
-			msg.addByte(0);
-		}
->>>>>>> 04a30ef (Market feature added)
 		msg.add<uint16_t>(it->amount);
 		msg.add<uint32_t>(it->price);
 		msg.addByte(it->state);
@@ -2318,7 +2175,6 @@ void ProtocolGame::sendMarketDetail(uint16_t itemId)
 	writeToOutputBuffer(msg);
 }
 
-<<<<<<< HEAD
 void ProtocolGame::sendQuestLog()
 {
 	NetworkMessage msg;
@@ -2353,8 +2209,6 @@ void ProtocolGame::sendQuestLine(const Quest* quest)
 	writeToOutputBuffer(msg);
 }
 
-=======
->>>>>>> 04a30ef (Market feature added)
 void ProtocolGame::sendTradeItemRequest(const std::string& traderName, const Item* item, bool ack)
 {
 	NetworkMessage msg;
@@ -2385,11 +2239,11 @@ void ProtocolGame::sendTradeItemRequest(const std::string& traderName, const Ite
 
 		msg.addByte(itemList.size());
 		for (const Item* listItem : itemList) {
-			msg.addItem(listItem);
+			msg.addItem(listItem, otclientV8);
 		}
 	} else {
 		msg.addByte(0x01);
-		msg.addItem(item);
+		msg.addItem(item, otclientV8);
 	}
 	writeToOutputBuffer(msg);
 }
@@ -2630,7 +2484,7 @@ void ProtocolGame::sendUpdateTileItem(const Position& pos, uint32_t stackpos, co
 	msg.addByte(0x6B);
 	msg.addPosition(pos);
 	msg.addByte(stackpos);
-	msg.addItem(item);
+	msg.addItem(item, otclientV8);
 	writeToOutputBuffer(msg);
 }
 
@@ -2909,7 +2763,7 @@ void ProtocolGame::sendInventoryItem(slots_t slot, const Item* item)
 	if (item) {
 		msg.addByte(0x78);
 		msg.addByte(slot);
-		msg.addItem(item);
+		msg.addItem(item, otclientV8);
 	} else {
 		msg.addByte(0x79);
 		msg.addByte(slot);
@@ -2945,7 +2799,7 @@ void ProtocolGame::sendAddContainerItem(uint8_t cid, uint16_t, const Item* item)
 	msg.addByte(0x70);
 	msg.addByte(cid);
 	//msg.add<uint16_t>(slot);
-	msg.addItem(item);
+	msg.addItem(item, otclientV8);
 	writeToOutputBuffer(msg);
 }
 
@@ -2956,7 +2810,7 @@ void ProtocolGame::sendUpdateContainerItem(uint8_t cid, uint16_t slot, const Ite
 	msg.addByte(cid);
 	//msg.add<uint16_t>(slot);
 	msg.addByte(slot);
-	msg.addItem(item);
+	msg.addItem(item, otclientV8);
 	writeToOutputBuffer(msg);
 }
 
@@ -2980,7 +2834,7 @@ void ProtocolGame::sendTextWindow(uint32_t windowTextId, Item* item, uint16_t ma
 	NetworkMessage msg;
 	msg.addByte(0x96);
 	msg.add<uint32_t>(windowTextId);
-	msg.addItem(item);
+	msg.addItem(item, otclientV8);
 
 	if (canWrite) {
 		msg.add<uint16_t>(maxlen);
@@ -3013,7 +2867,7 @@ void ProtocolGame::sendTextWindow(uint32_t windowTextId, uint32_t itemId, const 
 	NetworkMessage msg;
 	msg.addByte(0x96);
 	msg.add<uint32_t>(windowTextId);
-	msg.addItem(itemId, 1);
+	msg.addItem(itemId, 1, otclientV8);
 	msg.add<uint16_t>(text.size());
 	msg.addString(text);
 	//msg.add<uint16_t>(0x00);
@@ -3520,4 +3374,28 @@ void ProtocolGame::parseExtendedOpcode(NetworkMessage& msg)
 
 	// process additional opcodes via lua script event
 	addGameTask(&Game::parsePlayerExtendedOpcode, player->getID(), opcode, buffer);
+}
+
+// OTCv8
+void ProtocolGame::sendFeatures()
+{
+	if(!otclientV8) 
+		return;
+
+	std::map<GameFeature, bool> features;
+	// place for non-standard OTCv8 features
+	features[GameExtendedOpcode] = true;
+	features[GameItemTooltip] = true; // fully available from version 2.6
+
+	if(features.empty())
+		return;
+
+	NetworkMessage msg;
+	msg.addByte(0x43);
+	msg.add<uint16_t>(features.size());
+	for(auto& feature : features) {
+		msg.addByte((uint8_t)feature.first);
+		msg.addByte(feature.second ? 1 : 0);
+	}
+	writeToOutputBuffer(msg);
 }

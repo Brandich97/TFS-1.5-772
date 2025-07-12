@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * The Forgotten Server - a free and open-source MMORPG server emulator
  * Copyright (C) 2019  Mark Samman <mark.samman@gmail.com>
@@ -20,13 +19,6 @@
 
 #ifndef FS_IOMARKET_H_B981E52C218C42D3B9EF726EBF0E92C9
 #define FS_IOMARKET_H_B981E52C218C42D3B9EF726EBF0E92C9
-=======
-// Copyright 2022 The Forgotten Server Authors. All rights reserved.
-// Use of this source code is governed by the GPL-2.0 License that can be found in the LICENSE file.
-
-#ifndef FS_IOMARKET_H
-#define FS_IOMARKET_H
->>>>>>> 04a30ef (Market feature added)
 
 #include "enums.h"
 #include "database.h"

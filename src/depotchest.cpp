@@ -61,6 +61,8 @@ void DepotChest::postAddNotification(Thing* thing, const Cylinder* oldParent, in
 	if (parent != nullptr) {
 		parent->postAddNotification(thing, oldParent, index, LINK_PARENT);
 	}
+
+	save = true;
 }
 
 void DepotChest::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, cylinderlink_t)
@@ -70,12 +72,14 @@ void DepotChest::postRemoveNotification(Thing* thing, const Cylinder* newParent,
 		parent->postRemoveNotification(thing, newParent, index, LINK_PARENT);
 	}
 
+	save = true;
 }
 
-Cylinder* DepotChest::getParent() const
+/*Cylinder* DepotChest::getParent() const
 {
 	if (parent) {
 		return parent->getParent();
 	}
 	return nullptr;
 }
+*/

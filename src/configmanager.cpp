@@ -226,11 +226,7 @@ bool ConfigManager::load()
 		integer[STATUS_PORT] = getGlobalNumber(L, "statusProtocolPort", 7171);
 
 		integer[MARKET_OFFER_DURATION] = getGlobalNumber(L, "marketOfferDuration", 30 * 24 * 60 * 60);
-<<<<<<< HEAD
 	}
-=======
-    }
->>>>>>> 04a30ef (Market feature added)
 
 	boolean[ALLOW_CHANGEOUTFIT] = getGlobalBoolean(L, "allowChangeOutfit", true);
 	boolean[ONE_PLAYER_ON_ACCOUNT] = getGlobalBoolean(L, "onePlayerOnlinePerAccount", true);

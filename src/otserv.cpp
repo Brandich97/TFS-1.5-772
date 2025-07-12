@@ -322,19 +322,11 @@ void mainLoader(int, char*[], ServiceManager* services)
 
 	g_game.map.houses.payHouses(rentPeriod);
 
-<<<<<<< HEAD
 	//IOMarket::checkExpiredOffers();
 	//IOMarket::getInstance().updateStatistics();
 
 	std::cout << ">> Loaded all modules, server starting up..." << std::endl;
 
-=======
-	IOMarket::checkExpiredOffers();
-	IOMarket::getInstance().updateStatistics();
-	
-	std::cout << fmt::format(fg(fmt::color::tan), ">> Loaded all modules, server starting up...") << std::endl;
-/*
->>>>>>> 04a30ef (Market feature added)
 #ifndef _WIN32
 	if (getuid() == 0 || geteuid() == 0) {
 		std::cout << "> Warning: " << STATUS_SERVER_NAME << " has been executed as root user, please consider running it as a normal user." << std::endl;
