@@ -5070,7 +5070,7 @@ void Game::playerDebugAssert(uint32_t playerId, const std::string& assertLine, c
 	}
 }
 
-/*
+
 void Game::playerLeaveMarket(uint32_t playerId)
 {
 	Player* player = getPlayerByID(playerId);
@@ -5079,34 +5079,31 @@ void Game::playerLeaveMarket(uint32_t playerId)
 	}
 
 	player->setInMarket(false);
-}
-
-void Game::playerBrowseMarket(uint32_t playerId, uint16_t spriteId)
+}void Game::playerBrowseMarket(uint32_t playerId, uint16_t spriteId)
 {
-	Player* player = getPlayerByID(playerId);
-	if (!player) {
-		return;
-	}
+    Player* player = getPlayerByID(playerId);
+    if (!player) {
+        return;
+    }
 
-	if (!player->isInMarket()) {
-		return;
-	}
+    if (!player->isInMarket()) {
+        return;
+    }
 
-	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
-	if (it.id == 0) {
-		return;
-	}
+    const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+    if (it.id == 0) {
+        return;
+    }
 
-	if (it.wareId == 0) {
-		return;
-	}
+    if (it.wareId == 0) {
+        return;
+    }
 
-	const MarketOfferList& buyOffers = IOMarket::getActiveOffers(MARKETACTION_BUY, it.id);
-	const MarketOfferList& sellOffers = IOMarket::getActiveOffers(MARKETACTION_SELL, it.id);
-	player->sendMarketBrowseItem(it.id, buyOffers, sellOffers);
-	player->sendMarketDetail(it.id);
+    const MarketOfferList& buyOffers = IOMarket::getActiveOffers(MARKETACTION_BUY, it.id);
+    const MarketOfferList& sellOffers = IOMarket::getActiveOffers(MARKETACTION_SELL, it.id);
+    player->sendMarketBrowseItem(it.id, buyOffers, sellOffers);
+    player->sendMarketDetail(it.id);
 }
-
 void Game::playerBrowseMarketOwnOffers(uint32_t playerId)
 {
 	Player* player = getPlayerByID(playerId);
@@ -5163,7 +5160,7 @@ void Game::playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spr
 	}
 
 	if (g_config.getBoolean(ConfigManager::MARKET_PREMIUM) && !player->isPremium()) {
-		player->sendMarketLeave();
+		player->sendTextMessage(MESSAGE_EVENT_ADVANCE, "Only premium accounts may create offers for that object.");
 		return;
 	}
 
@@ -5187,23 +5184,19 @@ void Game::playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spr
 	}
 
 	uint64_t fee = (price / 100.) * amount;
-	if (fee < 20) {
-		fee = 20;
-	} else if (fee > 1000) {
-		fee = 1000;
-	}
+	if (fee < MIN_MARKET_FEE) {
+ 		fee = MIN_MARKET_FEE;
+ 	} else if (fee > MAX_MARKET_FEE) {
+ 		fee = MAX_MARKET_FEE;
+ 	}
 
 	if (type == MARKETACTION_SELL) {
 		if (fee > (player->getMoney() + player->bankBalance)) {
 			return;
 		}
 
-		DepotChest* depotChest = player->getDepotChest(player->getLastDepotId(), false);
-		if (!depotChest) {
-			return;
-		}
+		const auto& itemList = getMarketItemList(it.wareId, amount, *player);
 
-		std::forward_list<Item*> itemList = getMarketItemList(it.wareId, amount, depotChest, player->getInbox());
 		if (itemList.empty()) {
 			return;
 		}
@@ -5244,7 +5237,7 @@ void Game::playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spr
 
 	IOMarket::createOffer(player->getGUID(), static_cast<MarketAction_t>(type), it.id, amount, price, anonymous);
 
-	player->sendMarketEnter(player->getLastDepotId());
+	player->sendMarketEnter();
 	const MarketOfferList& buyOffers = IOMarket::getActiveOffers(MARKETACTION_BUY, it.id);
 	const MarketOfferList& sellOffers = IOMarket::getActiveOffers(MARKETACTION_SELL, it.id);
 	player->sendMarketBrowseItem(it.id, buyOffers, sellOffers);
@@ -5268,7 +5261,7 @@ void Game::playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 
 	if (offer.type == MARKETACTION_BUY) {
 		player->bankBalance += static_cast<uint64_t>(offer.price) * offer.amount;
-		player->sendMarketEnter(player->getLastDepotId());
+		player->sendMarketEnter();
 	} else {
 		const ItemType& it = Item::items[offer.itemId];
 		if (it.id == 0) {
@@ -5309,7 +5302,7 @@ void Game::playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 	offer.amount = 0;
 	offer.timestamp += g_config.getNumber(ConfigManager::MARKET_OFFER_DURATION);
 	player->sendMarketCancelOffer(offer);
-	player->sendMarketEnter(player->getLastDepotId());
+	player->sendMarketEnter();
 }
 
 void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount)
@@ -5328,9 +5321,10 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 	}
 
 	MarketOfferEx offer = IOMarket::getOfferByCounter(timestamp, counter);
-	if (offer.id == 0) {
-		return;
-	}
+    if (offer.id == 0) {
+		player->sendTextMessage(MESSAGE_EVENT_ADVANCE, "You cannot accept your own offer.");
+        return;
+    }
 
 	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
 	if (offerAccountId == player->getAccount()) {
@@ -5349,15 +5343,10 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 	uint64_t totalPrice = static_cast<uint64_t>(offer.price) * amount;
 
 	if (offer.type == MARKETACTION_BUY) {
-		DepotChest* depotChest = player->getDepotChest(player->getLastDepotId(), false);
-		if (!depotChest) {
-			return;
-		}
-
-		std::forward_list<Item*> itemList = getMarketItemList(it.wareId, amount, depotChest, player->getInbox());
-		if (itemList.empty()) {
-			return;
-		}
+		const auto& itemList = getMarketItemList(it.wareId, amount, *player);
+        if (itemList.empty()) {
+            return;
+        }
 
 		Player* buyerPlayer = getPlayerByGUID(offer.playerId);
 		if (!buyerPlayer) {
@@ -5485,10 +5474,10 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 		IOMarket::acceptOffer(offer.id, amount);
 	}
 
-	player->sendMarketEnter(player->getLastDepotId());
+	player->sendMarketEnter();
 	offer.timestamp += marketOfferDuration;
 	player->sendMarketAcceptOffer(offer);
-}*/
+}
 
 void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer)
 {
@@ -5502,8 +5491,59 @@ void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const st
 	}
 }
 
-/*
-std::forward_list<Item*> Game::getMarketItemList(uint16_t wareId, uint16_t sufficientCount, DepotChest* depotChest, Inbox* inbox)
+
+=======
+std::forward_list<Item*> Game::getMarketItemList(uint16_t wareId, uint16_t sufficientCount, const Player& player)
+{
+    std::forward_list<Item*> itemList;
+    uint16_t count = 0;
+
+    std::list<Container*> containers{player.getInbox().get()};
+
+	for (const auto& chest : player.depotChests) {
+		std::shared_ptr<DepotChest> depotChest = chest.second;
+		Container* container = dynamic_cast<Container*>(depotChest.get());
+		if (!container->empty()) {
+			containers.push_front(container);
+		}
+	}
+
+    do {
+        Container* container = containers.front();
+        containers.pop_front();
+
+        for (Item* item : container->getItemList()) {
+			Container* containerItem = item->getContainer();
+			if (containerItem && !containerItem->empty()) {
+				containers.push_back(containerItem);
+                continue;
+            }
+
+            const ItemType& itemType = Item::items[item->getID()];
+            if (itemType.wareId != wareId) {
+                continue;
+            }
+
+			if (containerItem && (!itemType.isContainer() || containerItem->capacity() != itemType.maxItems)) {
+                continue;
+            }
+
+            if (!item->hasMarketAttributes()) {
+                continue;
+            }
+
+            itemList.push_front(item);
+
+            count += Item::countByType(item, -1);
+            if (count >= sufficientCount) {
+                return itemList;
+            }
+        }
+    } while (!containers.empty());
+	return {};
+}
+
+void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage* msg)
 {
 	std::forward_list<Item*> itemList;
 	uint16_t count = 0;
@@ -5543,7 +5583,7 @@ std::forward_list<Item*> Game::getMarketItemList(uint16_t wareId, uint16_t suffi
 	} while (!containers.empty());
 	return std::forward_list<Item*>();
 }
-*/
+
 
 void Game::forceAddCondition(uint32_t creatureId, Condition* condition)
 {

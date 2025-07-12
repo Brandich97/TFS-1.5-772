@@ -367,6 +367,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 			DepotLocker* myDepotLocker = player->getDepotLocker(depot->getDepotId());
 			myDepotLocker->setParent(depot->getParent()->getTile());
 			openContainer = myDepotLocker;
+			player->setLastDepotId(depot->getDepotId());
 		} else {
 			openContainer = container;
 		}
@@ -509,11 +510,14 @@ bool Action::configureEvent(const pugi::xml_node& node)
 
 namespace {
 
-bool enterMarket(Player*, Item*, const Position&, Thing*, const Position&, bool)
+bool enterMarket(Player* player, Item*, const Position&, Thing*, const Position&, bool)
 {
+    if (player->getLastDepotId() == -1) {
+        return false;
+    }
 
-	//player->sendMarketEnter(player->getLastDepotId());
-	return true;
+    player->sendMarketEnter(player->getLastDepotId());
+    return true;
 }
 
 }

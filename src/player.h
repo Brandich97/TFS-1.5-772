@@ -9,8 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
@@ -250,6 +249,9 @@ class Player final : public Creature, public Cylinder
 		}
 
 		Inbox* getInbox() const {
+			if (!inbox) {
+				const_cast<Player*>(this)->inbox = new Inbox(ITEM_INBOX);
+			}
 			return inbox;
 		}
 
@@ -364,14 +366,12 @@ class Player final : public Creature, public Cylinder
 		bool isInMarket() const {
 			return inMarket;
 		}
-
-		void resetIdleTime() {
-			idleTime = 0;
-		}
-
-		bool isInGhostMode() const override {
-			return ghostMode;
-		}
+		
+		int32_t getIdleTime() const { return idleTime; }
+		void setIdleTime(int32_t time) { idleTime = time; }
+		void resetIdleTime() { idleTime = 0; }
+		
+		bool isInGhostMode() const override { return ghostMode; }
 		bool canSeeGhostMode(const Creature* creature) const override;
 		void switchGhostMode() {
 			ghostMode = !ghostMode;
@@ -1012,15 +1012,9 @@ class Player final : public Creature, public Cylinder
 				client->sendCloseShop();
 			}
 		}
-		void sendMarketEnter(uint32_t depotId) const {
+		void sendMarketEnter() const {
 			if (client) {
-				client->sendMarketEnter(depotId);
-			}
-		}
-		void sendMarketLeave() {
-			inMarket = false;
-			if (client) {
-				client->sendMarketLeave();
+				client->sendMarketEnter();
 			}
 		}
 		void sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers, const MarketOfferList& sellOffers) const {

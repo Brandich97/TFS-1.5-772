@@ -322,10 +322,10 @@ void mainLoader(int, char*[], ServiceManager* services)
 
 	g_game.map.houses.payHouses(rentPeriod);
 
-	//IOMarket::checkExpiredOffers();
-	//IOMarket::getInstance().updateStatistics();
-
-	std::cout << ">> Loaded all modules, server starting up..." << std::endl;
+	IOMarket::checkExpiredOffers();
+	IOMarket::getInstance().updateStatistics();
+	
+	std::cout << fmt::format(fg(fmt::color::tan), ">> Loaded all modules, server starting up...") << std::endl;
 
 #ifndef _WIN32
 	if (getuid() == 0 || geteuid() == 0) {

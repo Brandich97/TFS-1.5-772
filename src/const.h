@@ -1,7 +1,7 @@
 /**
  * The Forgotten Server - a free and open-source MMORPG server emulator
  * Copyright (C) 2019  Mark Samman <mark.samman@gmail.com>
- *
+
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -21,8 +21,10 @@
 #define FS_CONST_H_0A49B5996F074465BF44B90F4F780E8B
 
 static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 65500;
+static constexpr int32_t MIN_MARKET_FEE = 20;
+static constexpr int32_t MAX_MARKET_FEE = 100000;
 
-enum MagicEffectClasses : uint8_t {
+enum MagicEffectClasses : uint16_t {
 	CONST_ME_NONE,
 
 	CONST_ME_DRAWBLOOD = 1,
@@ -509,9 +511,9 @@ enum item_t : uint16_t {
 
 	ITEM_DEPOT = 2594,
 	ITEM_LOCKER1 = 2589,
-	/*ITEM_INBOX = 14404,
-	ITEM_MARKET = 14405,
-	ITEM_STORE_INBOX = 26052,
+	ITEM_INBOX = 5200,
+	ITEM_MARKET = 5201,
+	/*ITEM_STORE_INBOX = 26052,
 	ITEM_DEPOT_BOX_I = 25453,
 	ITEM_DEPOT_BOX_II = 25454,
 	ITEM_DEPOT_BOX_III = 25455,
@@ -609,7 +611,7 @@ enum ReloadTypes_t : uint8_t  {
 	RELOAD_TYPE_SPELLS,
 	RELOAD_TYPE_TALKACTIONS,
 	RELOAD_TYPE_WEAPONS,
-};
+	};
 
 // OTCv8 features (from src/client/const.h)
 enum GameFeature {

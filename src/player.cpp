@@ -48,11 +48,11 @@ MuteCountMap Player::muteCountMap;
 uint32_t Player::playerAutoID = 0x10000000;
 
 Player::Player(ProtocolGame_ptr p) :
-	Creature(), lastPing(OTSYS_TIME()), lastPong(lastPing), /*inbox(new Inbox(ITEM_INBOX)), storeInbox(new StoreInbox(ITEM_STORE_INBOX)),*/ client(std::move(p))
+	Creature(), lastPing(OTSYS_TIME()), lastPong(lastPing), inbox(new Inbox(ITEM_INBOX)), /*storeInbox(new StoreInbox(ITEM_STORE_INBOX)),*/ client(std::move(p))
 {
-	/*inbox->incrementReferenceCounter();
+	inbox->incrementReferenceCounter();
 
-	storeInbox->setParent(this);
+	/*storeInbox->setParent(this);
 	storeInbox->incrementReferenceCounter();*/
 }
 
@@ -65,13 +65,13 @@ Player::~Player()
 		}
 	}
 
-	/*for (const auto& it : depotLockerMap) {
+	for (const auto& it : depotLockerMap) {
 		it.second->removeInbox(inbox);
 	}
 
 	inbox->decrementReferenceCounter();
 
-	storeInbox->setParent(nullptr);
+	/*storeInbox->setParent(nullptr);
 	storeInbox->decrementReferenceCounter();*/
 
 	setWriteItem(nullptr);
@@ -407,7 +407,7 @@ uint16_t Player::getClientIcons() const
 		icons |= ICON_REDSWORDS;
 	}
 
-	
+	/*
 	if (tile && tile->hasFlag(TILESTATE_PROTECTIONZONE)) {
 		icons |= ICON_PIGEON;
 
@@ -415,7 +415,7 @@ uint16_t Player::getClientIcons() const
 		if (hasBitSet(ICON_SWORDS, icons)) {
 			icons &= ~ICON_SWORDS;
 		}
-	}
+	}*/
 
 	// Game client debugs with 10 or more icons
 	// so let's prevent that from happening.
@@ -839,14 +839,14 @@ DepotLocker* Player::getDepotLocker(uint32_t depotId)
 {
 	auto it = depotLockerMap.find(depotId);
 	if (it != depotLockerMap.end()) {
-		//inbox->setParent(it->second.get());
+		inbox->setParent(it->second.get());
 		return it->second.get();
 	}
 
 	it = depotLockerMap.emplace(depotId, new DepotLocker(ITEM_LOCKER1)).first;
 	it->second->setDepotId(depotId);
-	//it->second->internalAddThing(Item::CreateItem(ITEM_MARKET));
-	//it->second->internalAddThing(inbox);
+	it->second->internalAddThing(Item::CreateItem(ITEM_MARKET));
+	it->second->internalAddThing(inbox);
 	it->second->internalAddThing(getDepotChest(depotId, true));
 	return it->second.get();
 }

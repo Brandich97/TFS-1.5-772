@@ -504,7 +504,7 @@ bool IOLoginData::loadPlayer(Player* player, DBResult_ptr result)
 	}
 
 	//load inbox items
-	/*itemMap.clear();
+	itemMap.clear();
 
 	if ((result = db.storeQuery(fmt::format("SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_inboxitems` WHERE `player_id` = {:d} ORDER BY `sid` DESC", player->getGUID())))) {
 		loadItems(itemMap, result);
@@ -532,7 +532,7 @@ bool IOLoginData::loadPlayer(Player* player, DBResult_ptr result)
 	}
 
 	//load store inbox items
-	itemMap.clear();
+	/*itemMap.clear();
 
 	if ((result = db.storeQuery(fmt::format("SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_storeinboxitems` WHERE `player_id` = {:d} ORDER BY `sid` DESC", player->getGUID())))) {
 		loadItems(itemMap, result);
@@ -794,59 +794,28 @@ bool IOLoginData::savePlayer(Player* player)
 		return false;
 	}
 
-	//save depot locker items
-	bool needsSave = false;
+if (player->lastDepotId != -1) {
+    //save depot items
+    if (!db.executeQuery(fmt::format("DELETE FROM `player_depotitems` WHERE `player_id` = {:d}", player->getGUID()))) {
+        return false;
+    }
 
-	for (const auto& it : player->depotLockerMap) {
-		if (it.second->needsSave()) {
-			needsSave = true;
-			break;
-		}
-	}
+    DBInsert depotQuery("INSERT INTO `player_depotitems` (`player_id`, `pid`, `sid`, `itemtype`, `count`, `attributes`) VALUES ");
+    itemList.clear();
 
-	if (needsSave) {
-		if (!db.executeQuery(fmt::format("DELETE FROM `player_depotlockeritems` WHERE `player_id` = {:d}", player->getGUID()))) {
-			return false;
-		}
+    for (const auto& it : player->depotChests) {
+        for (Item* item : it.second->getItemList()) {
+            itemList.emplace_back(it.first, item);
+        }
+    }
 
-		DBInsert lockerQuery("INSERT INTO `player_depotlockeritems` (`player_id`, `pid`, `sid`, `itemtype`, `count`, `attributes`) VALUES ");
-		itemList.clear();
-
-		for (const auto& it : player->depotLockerMap) {
-			for (Item* item : it.second->getItemList()) {
-				if (item->getID() != ITEM_DEPOT) {
-					itemList.emplace_back(it.first, item);
-				}
-			}
-		}
-
-		if (!saveItems(player, itemList, lockerQuery, propWriteStream)) {
-			return false;
-		}
-
-		//save depot items
-		if (needsSave) {
-			if (!db.executeQuery(fmt::format("DELETE FROM `player_depotitems` WHERE `player_id` = {:d}", player->getGUID()))) {
-				return false;
-			}
-
-			DBInsert depotQuery("INSERT INTO `player_depotitems` (`player_id`, `pid`, `sid`, `itemtype`, `count`, `attributes`) VALUES ");
-			itemList.clear();
-
-			for (const auto& it : player->depotChests) {
-				for (Item* item : it.second->getItemList()) {
-					itemList.emplace_back(it.first, item);
-				}
-			}
-
-			if (!saveItems(player, itemList, depotQuery, propWriteStream)) {
-				return false;
-			}
-		}
-	}
+    if (!saveItems(player, itemList, depotQuery, propWriteStream)) {
+        return false;
+    }
+}
 
 	//save inbox items
-	/*if (!db.executeQuery(fmt::format("DELETE FROM `player_inboxitems` WHERE `player_id` = {:d}", player->getGUID()))) {
+	if (!db.executeQuery(fmt::format("DELETE FROM `player_inboxitems` WHERE `player_id` = {:d}", player->getGUID()))) {
 		return false;
 	}
 
@@ -862,7 +831,7 @@ bool IOLoginData::savePlayer(Player* player)
 	}
 
 	//save store inbox items
-	if (!db.executeQuery(fmt::format("DELETE FROM `player_storeinboxitems` WHERE `player_id` = {:d}", player->getGUID()))) {
+	/*if (!db.executeQuery(fmt::format("DELETE FROM `player_storeinboxitems` WHERE `player_id` = {:d}", player->getGUID()))) {
 		return false;
 	}
 

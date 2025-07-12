@@ -1972,32 +1972,32 @@ void LuaScriptInterface::registerFunctions()
 	// configKeys
 	registerTable("configKeys");
 
-	registerEnumIn("configKeys", ConfigManager::ALLOW_CHANGEOUTFIT)
-	registerEnumIn("configKeys", ConfigManager::ONE_PLAYER_ON_ACCOUNT)
-	registerEnumIn("configKeys", ConfigManager::AIMBOT_HOTKEY_ENABLED)
-	registerEnumIn("configKeys", ConfigManager::REMOVE_RUNE_CHARGES)
-	registerEnumIn("configKeys", ConfigManager::REMOVE_WEAPON_AMMO)
-	registerEnumIn("configKeys", ConfigManager::REMOVE_WEAPON_CHARGES)
-	registerEnumIn("configKeys", ConfigManager::REMOVE_POTION_CHARGES)
-	registerEnumIn("configKeys", ConfigManager::EXPERIENCE_FROM_PLAYERS)
-	registerEnumIn("configKeys", ConfigManager::FREE_PREMIUM)
-	registerEnumIn("configKeys", ConfigManager::REPLACE_KICK_ON_LOGIN)
-	registerEnumIn("configKeys", ConfigManager::ALLOW_CLONES)
-	registerEnumIn("configKeys", ConfigManager::BIND_ONLY_GLOBAL_ADDRESS)
-	registerEnumIn("configKeys", ConfigManager::OPTIMIZE_DATABASE)
+	registerEnumIn("configKeys", ConfigManager::ALLOW_CHANGEOUTFIT);
+	registerEnumIn("configKeys", ConfigManager::ONE_PLAYER_ON_ACCOUNT);
+	registerEnumIn("configKeys", ConfigManager::AIMBOT_HOTKEY_ENABLED);
+	registerEnumIn("configKeys", ConfigManager::REMOVE_RUNE_CHARGES);
+	registerEnumIn("configKeys", ConfigManager::REMOVE_WEAPON_AMMO);
+	registerEnumIn("configKeys", ConfigManager::REMOVE_WEAPON_CHARGES);
+	registerEnumIn("configKeys", ConfigManager::REMOVE_POTION_CHARGES);
+	registerEnumIn("configKeys", ConfigManager::EXPERIENCE_FROM_PLAYERS);
+	registerEnumIn("configKeys", ConfigManager::FREE_PREMIUM);
+	registerEnumIn("configKeys", ConfigManager::REPLACE_KICK_ON_LOGIN);
+	registerEnumIn("configKeys", ConfigManager::ALLOW_CLONES);
+	registerEnumIn("configKeys", ConfigManager::BIND_ONLY_GLOBAL_ADDRESS);
+	registerEnumIn("configKeys", ConfigManager::OPTIMIZE_DATABASE);
 	registerEnumIn("configKeys", ConfigManager::MARKET_PREMIUM)
-	registerEnumIn("configKeys", ConfigManager::EMOTE_SPELLS)
-	registerEnumIn("configKeys", ConfigManager::STAMINA_SYSTEM)
-	registerEnumIn("configKeys", ConfigManager::WARN_UNSAFE_SCRIPTS)
-	registerEnumIn("configKeys", ConfigManager::CONVERT_UNSAFE_SCRIPTS)
-	registerEnumIn("configKeys", ConfigManager::CLASSIC_EQUIPMENT_SLOTS)
-	registerEnumIn("configKeys", ConfigManager::CLASSIC_ATTACK_SPEED)
-	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_NOTIFY_MESSAGE)
-	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_NOTIFY_DURATION)
-	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_CLEAN_MAP)
-	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_CLOSE)
-	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_SHUTDOWN)
-	registerEnumIn("configKeys", ConfigManager::ONLINE_OFFLINE_CHARLIST)
+	registerEnumIn("configKeys", ConfigManager::EMOTE_SPELLS);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_SYSTEM);
+	registerEnumIn("configKeys", ConfigManager::WARN_UNSAFE_SCRIPTS);
+	registerEnumIn("configKeys", ConfigManager::CONVERT_UNSAFE_SCRIPTS);
+	registerEnumIn("configKeys", ConfigManager::CLASSIC_EQUIPMENT_SLOTS);
+	registerEnumIn("configKeys", ConfigManager::CLASSIC_ATTACK_SPEED);
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_NOTIFY_MESSAGE);
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_NOTIFY_DURATION);
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_CLEAN_MAP);
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_CLOSE);
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_SHUTDOWN);
+	registerEnumIn("configKeys", ConfigManager::ONLINE_OFFLINE_CHARLIST);
 	registerEnumIn("configKeys", ConfigManager::LUA_ITEM_DESC)
 
 	registerEnumIn("configKeys", ConfigManager::MAP_NAME)
@@ -2562,7 +2562,16 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod("Player", "hasSecureMode", LuaScriptInterface::luaPlayerHasSecureMode);
 	registerMethod("Player", "getFightMode", LuaScriptInterface::luaPlayerGetFightMode);
 
-	registerMethod("Player", "getStoreInbox", LuaScriptInterface::luaPlayerGetStoreInbox);
+	registerMethod("Player", "getAttackSpeed", LuaScriptInterface::luaPlayerGetAttackSpeed);
+	registerMethod("Player", "setAttackSpeed", LuaScriptInterface::luaPlayerSetAttackSpeed);
+	
+	registerMethod("Player", "getIdleTime", LuaScriptInterface::luaPlayerGetIdleTime);
+	registerMethod("Player", "setIdleTime", LuaScriptInterface::luaPlayerSetIdleTime);
+	registerMethod("Player", "resetIdleTime", LuaScriptInterface::luaPlayerResetIdleTime);
+
+	registerMethod("Player", "isNearDepotBox", LuaScriptInterface::luaPlayerIsNearDepotBox);
+ 	
+ 	registerMethod("Player", "openMarket", LuaScriptInterface::luaPlayerOpenMarket);
 
 	// Monster
 	registerClass("Monster", "Creature", LuaScriptInterface::luaMonsterCreate);
@@ -8404,6 +8413,7 @@ int LuaScriptInterface::luaPlayerGetDepotChest(lua_State* L)
 	bool autoCreate = getBoolean(L, 3, false);
 	DepotChest* depotChest = player->getDepotChest(depotId, autoCreate);
 	if (depotChest) {
+		player->setLastDepotId(depotId); // FIXME: workaround for #2251
 		pushUserdata<Item>(L, depotChest);
 		setItemMetatable(L, -1, depotChest);
 	} else {
@@ -10323,6 +10333,97 @@ int LuaScriptInterface::luaPlayerHasSecureMode(lua_State* L)
 	if (player) {
 		pushBoolean(L, player->secureMode);
 	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+int LuaScriptInterface::luaPlayerGetIdleTime(lua_State* L)
+{
+	// player:getIdleTime()
+	const Player* const player = getUserdata<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+	lua_pushnumber(L, player->getIdleTime());
+	return 1;
+}
+
+int LuaScriptInterface::luaPlayerSetAttackSpeed(lua_State* L)
+{
+	// player:setAttackSpeed(ms)
+	Player* player = getUserdata<Player>(L, 1);
+	uint32_t ms = getNumber<uint32_t>(L, 2);
+	if (player) {
+		player->setAttackSpeed(ms);
+		pushBoolean(L, true);
+	}
+	else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaPlayerIsNearDepotBox(lua_State* L)
+{
+	// player:isNearDepotBox()
+	const Player* const player = getUserdata<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+	pushBoolean(L, player->isNearDepotBox());
+	return 1;
+}
+
+int LuaScriptInterface::luaPlayerSetIdleTime(lua_State* L)
+{
+	// player:setIdleTime(time)
+	Player* player = getUserdata<Player>(L, 1);
+	if (player) {
+		player->setIdleTime(getNumber<int32_t>(L, 2));
+		pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaPlayerResetIdleTime(lua_State* L)
+{
+	// player:resetIdleTime()
+	Player* player = getUserdata<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+	player->resetIdleTime();
+	pushBoolean(L, true);
+	return 1;
+}
+ 
+ int LuaScriptInterface::luaPlayerOpenMarket(lua_State* L)
+ {
+ 	// player:openMarket()
+ 	Player* player = getUserdata<Player>(L, 1);
+ 	if (!player) {
+ 		lua_pushnil(L);
+ 		return 1;
+ 	}
+ 
+ 	player->sendMarketEnter();
+ 	pushBoolean(L, true);
+ 	return 1;
+ }
+
+int LuaScriptInterface::luaPlayerGetAttackSpeed(lua_State* L)
+{
+	// player:getAttackSpeed()
+	Player* player = getUserdata<Player>(L, 1);
+	if (player) {
+		lua_pushnumber(L, player->getAttackSpeed());
+	}
+	else {
 		lua_pushnil(L);
 	}
 	return 1;
