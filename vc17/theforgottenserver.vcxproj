@@ -199,6 +199,7 @@ cryptopp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include="..\src\iomap.cpp" />
     <ClCompile Include="..\src\iomapserialize.cpp" />
     <ClCompile Include="..\src\iomarket.cpp" />
+     <ClCompile Include="..\src\iomarket.cpp" />
     <ClCompile Include="..\src\item.cpp" />
     <ClCompile Include="..\src\items.cpp" />
     <ClCompile Include="..\src\luascript.cpp" />
@@ -288,6 +289,7 @@ cryptopp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include="..\src\iomap.h" />
     <ClInclude Include="..\src\iomapserialize.h" />
     <ClInclude Include="..\src\iomarket.h" />
+     <ClInclude Include="..\src\iomarket.h" />
     <ClInclude Include="..\src\item.h" />
     <ClInclude Include="..\src\itemloader.h" />
     <ClInclude Include="..\src\items.h" />

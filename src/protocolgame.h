@@ -220,7 +220,12 @@ class ProtocolGame final : public Protocol
 		void sendShop(const ShopInfoList& itemList);
 		void sendCloseShop();
 		void sendSaleItemList(const std::list<ShopInfo>& shop);
+<<<<<<< HEAD
+		void sendMarketEnter(uint32_t depotId);
+		void sendMarketLeave();
+=======
 		void sendMarketEnter();
+>>>>>>> 04a30ef (Market feature added)
 		void sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers, const MarketOfferList& sellOffers);
 		void sendMarketAcceptOffer(const MarketOfferEx& offer);
 		void sendMarketBrowseOwnOffers(const MarketOfferList& buyOffers, const MarketOfferList& sellOffers);
@@ -314,9 +319,6 @@ class ProtocolGame final : public Protocol
 		//otclient
 		void parseExtendedOpcode(NetworkMessage& msg);
 
-		//OTCv8
-		void sendFeatures();
-
 		friend class Player;
 
 		// Helpers so we don't need to bind every time
@@ -341,8 +343,6 @@ class ProtocolGame final : public Protocol
 
 		bool debugAssertSent = false;
 		bool acceptPackets = false;
-
-		uint16_t otclientV8 = 0;
 };
 
 #endif

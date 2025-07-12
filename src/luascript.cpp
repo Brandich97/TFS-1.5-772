@@ -1972,6 +1972,34 @@ void LuaScriptInterface::registerFunctions()
 	// configKeys
 	registerTable("configKeys");
 
+<<<<<<< HEAD
+	registerEnumIn("configKeys", ConfigManager::ALLOW_CHANGEOUTFIT)
+	registerEnumIn("configKeys", ConfigManager::ONE_PLAYER_ON_ACCOUNT)
+	registerEnumIn("configKeys", ConfigManager::AIMBOT_HOTKEY_ENABLED)
+	registerEnumIn("configKeys", ConfigManager::REMOVE_RUNE_CHARGES)
+	registerEnumIn("configKeys", ConfigManager::REMOVE_WEAPON_AMMO)
+	registerEnumIn("configKeys", ConfigManager::REMOVE_WEAPON_CHARGES)
+	registerEnumIn("configKeys", ConfigManager::REMOVE_POTION_CHARGES)
+	registerEnumIn("configKeys", ConfigManager::EXPERIENCE_FROM_PLAYERS)
+	registerEnumIn("configKeys", ConfigManager::FREE_PREMIUM)
+	registerEnumIn("configKeys", ConfigManager::REPLACE_KICK_ON_LOGIN)
+	registerEnumIn("configKeys", ConfigManager::ALLOW_CLONES)
+	registerEnumIn("configKeys", ConfigManager::BIND_ONLY_GLOBAL_ADDRESS)
+	registerEnumIn("configKeys", ConfigManager::OPTIMIZE_DATABASE)
+	registerEnumIn("configKeys", ConfigManager::MARKET_PREMIUM)
+	registerEnumIn("configKeys", ConfigManager::EMOTE_SPELLS)
+	registerEnumIn("configKeys", ConfigManager::STAMINA_SYSTEM)
+	registerEnumIn("configKeys", ConfigManager::WARN_UNSAFE_SCRIPTS)
+	registerEnumIn("configKeys", ConfigManager::CONVERT_UNSAFE_SCRIPTS)
+	registerEnumIn("configKeys", ConfigManager::CLASSIC_EQUIPMENT_SLOTS)
+	registerEnumIn("configKeys", ConfigManager::CLASSIC_ATTACK_SPEED)
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_NOTIFY_MESSAGE)
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_NOTIFY_DURATION)
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_CLEAN_MAP)
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_CLOSE)
+	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_SHUTDOWN)
+	registerEnumIn("configKeys", ConfigManager::ONLINE_OFFLINE_CHARLIST)
+=======
 	registerEnumIn("configKeys", ConfigManager::ALLOW_CHANGEOUTFIT);
 	registerEnumIn("configKeys", ConfigManager::ONE_PLAYER_ON_ACCOUNT);
 	registerEnumIn("configKeys", ConfigManager::AIMBOT_HOTKEY_ENABLED);
@@ -1979,6 +2007,7 @@ void LuaScriptInterface::registerFunctions()
 	registerEnumIn("configKeys", ConfigManager::REMOVE_WEAPON_AMMO);
 	registerEnumIn("configKeys", ConfigManager::REMOVE_WEAPON_CHARGES);
 	registerEnumIn("configKeys", ConfigManager::REMOVE_POTION_CHARGES);
+	registerEnumIn("configKeys", ConfigManager::PZLOCK_SKULL_ATTACKER)
 	registerEnumIn("configKeys", ConfigManager::EXPERIENCE_FROM_PLAYERS);
 	registerEnumIn("configKeys", ConfigManager::FREE_PREMIUM);
 	registerEnumIn("configKeys", ConfigManager::REPLACE_KICK_ON_LOGIN);
@@ -1998,6 +2027,7 @@ void LuaScriptInterface::registerFunctions()
 	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_CLOSE);
 	registerEnumIn("configKeys", ConfigManager::SERVER_SAVE_SHUTDOWN);
 	registerEnumIn("configKeys", ConfigManager::ONLINE_OFFLINE_CHARLIST);
+>>>>>>> 04a30ef (Market feature added)
 	registerEnumIn("configKeys", ConfigManager::LUA_ITEM_DESC)
 
 	registerEnumIn("configKeys", ConfigManager::MAP_NAME)
@@ -2053,6 +2083,61 @@ void LuaScriptInterface::registerFunctions()
 	registerEnumIn("configKeys", ConfigManager::MAX_PACKETS_PER_SECOND)
 	registerEnumIn("configKeys", ConfigManager::PLAYER_CONSOLE_LOGS)
 
+<<<<<<< HEAD
+=======
+	registerEnumIn("configKeys", ConfigManager::SQL_PORT);
+	registerEnumIn("configKeys", ConfigManager::MAX_PLAYERS);
+	registerEnumIn("configKeys", ConfigManager::PZ_LOCKED);
+	registerEnumIn("configKeys", ConfigManager::DEFAULT_DESPAWNRANGE);
+	registerEnumIn("configKeys", ConfigManager::DEFAULT_DESPAWNRADIUS);
+	registerEnumIn("configKeys", ConfigManager::DEFAULT_WALKTOSPAWNRADIUS);
+	registerEnumIn("configKeys", ConfigManager::REMOVE_ON_DESPAWN);
+	registerEnumIn("configKeys", ConfigManager::BED_OFFLINE_TRAINING);
+	registerEnumIn("configKeys", ConfigManager::PROTECTION_TIME);
+	registerEnumIn("configKeys", ConfigManager::NPCS_USING_BANK_MONEY);
+	registerEnumIn("configKeys", ConfigManager::RATE_EXPERIENCE);
+	registerEnumIn("configKeys", ConfigManager::RATE_SKILL);
+	registerEnumIn("configKeys", ConfigManager::RATE_LOOT);
+	registerEnumIn("configKeys", ConfigManager::RATE_MAGIC);
+	registerEnumIn("configKeys", ConfigManager::HOUSE_LEVEL);
+	registerEnumIn("configKeys", ConfigManager::HOUSE_PRICE);
+	registerEnumIn("configKeys", ConfigManager::KILLS_TO_RED);
+	registerEnumIn("configKeys", ConfigManager::KILLS_TO_BLACK);
+	registerEnumIn("configKeys", ConfigManager::MAX_MESSAGEBUFFER);
+	registerEnumIn("configKeys", ConfigManager::PROTECTION_LEVEL);
+	registerEnumIn("configKeys", ConfigManager::DEATH_LOSE_PERCENT);
+	registerEnumIn("configKeys", ConfigManager::STATUSQUERY_TIMEOUT);
+	registerEnumIn("configKeys", ConfigManager::FRAG_TIME);
+	registerEnumIn("configKeys", ConfigManager::WHITE_SKULL_TIME);
+	registerEnumIn("configKeys", ConfigManager::GAME_PORT);
+	registerEnumIn("configKeys", ConfigManager::LOGIN_PORT);
+	registerEnumIn("configKeys", ConfigManager::STATUS_PORT);
+	registerEnumIn("configKeys", ConfigManager::STAIRHOP_DELAY);
+	registerEnumIn("configKeys", ConfigManager::MARKET_OFFER_DURATION)
+	registerEnumIn("configKeys", ConfigManager::CHECK_EXPIRED_MARKET_OFFERS_EACH_MINUTES)
+	registerEnumIn("configKeys", ConfigManager::MAX_MARKET_OFFERS_AT_A_TIME_PER_PLAYER)
+	registerEnumIn("configKeys", ConfigManager::EXP_FROM_PLAYERS_LEVEL_RANGE);
+	registerEnumIn("configKeys", ConfigManager::MAX_PACKETS_PER_SECOND);
+	registerEnumIn("configKeys", ConfigManager::MAGIC_WALL_ID);
+	registerEnumIn("configKeys", ConfigManager::MAGIC_WALL_STORAGE);
+	registerEnumIn("configKeys", ConfigManager::OLD_MAGIC_WALL_ID);
+	registerEnumIn("configKeys", ConfigManager::STORAGEVALUE_EMOTE);
+	
+	// Stamina Configs
+	registerEnumIn("configKeys", ConfigManager::STAMINA_REGEN_MINUTE);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_REGEN_PREMIUM);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_TRAINER);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_PZ);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_PZ_GAIN);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_ORANGE_DELAY);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_GREEN_DELAY);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_TRAINER_DELAY);
+	registerEnumIn("configKeys", ConfigManager::STAMINA_TRAINER_GAIN);
+	
+	registerEnumIn("configKeys", ConfigManager::MAX_ALLOWED_ON_A_DUMMY);
+	registerEnumIn("configKeys", ConfigManager::RATE_EXERCISE_TRAINING_SPEED);
+	
+>>>>>>> 04a30ef (Market feature added)
 	// os
 	registerMethod("os", "mtime", LuaScriptInterface::luaSystemTime);
 
@@ -2561,9 +2646,15 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod("Player", "hasChaseMode", LuaScriptInterface::luaPlayerHasChaseMode);
 	registerMethod("Player", "hasSecureMode", LuaScriptInterface::luaPlayerHasSecureMode);
 	registerMethod("Player", "getFightMode", LuaScriptInterface::luaPlayerGetFightMode);
+<<<<<<< HEAD
 
+	registerMethod("Player", "getStoreInbox", LuaScriptInterface::luaPlayerGetStoreInbox);
+
+=======
 	registerMethod("Player", "getAttackSpeed", LuaScriptInterface::luaPlayerGetAttackSpeed);
 	registerMethod("Player", "setAttackSpeed", LuaScriptInterface::luaPlayerSetAttackSpeed);
+	
+	registerMethod("Player", "isNearDepotBox", LuaScriptInterface::luaPlayerIsNearDepotBox);
 	
 	registerMethod("Player", "getIdleTime", LuaScriptInterface::luaPlayerGetIdleTime);
 	registerMethod("Player", "setIdleTime", LuaScriptInterface::luaPlayerSetIdleTime);
@@ -2572,7 +2663,8 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod("Player", "isNearDepotBox", LuaScriptInterface::luaPlayerIsNearDepotBox);
  	
  	registerMethod("Player", "openMarket", LuaScriptInterface::luaPlayerOpenMarket);
-
+	
+>>>>>>> 04a30ef (Market feature added)
 	// Monster
 	registerClass("Monster", "Creature", LuaScriptInterface::luaMonsterCreate);
 	registerMetaMethod("Monster", "__eq", LuaScriptInterface::luaUserdataCompare);
@@ -8413,7 +8505,6 @@ int LuaScriptInterface::luaPlayerGetDepotChest(lua_State* L)
 	bool autoCreate = getBoolean(L, 3, false);
 	DepotChest* depotChest = player->getDepotChest(depotId, autoCreate);
 	if (depotChest) {
-		player->setLastDepotId(depotId); // FIXME: workaround for #2251
 		pushUserdata<Item>(L, depotChest);
 		setItemMetatable(L, -1, depotChest);
 	} else {
@@ -10337,6 +10428,9 @@ int LuaScriptInterface::luaPlayerHasSecureMode(lua_State* L)
 	}
 	return 1;
 }
+
+<<<<<<< HEAD
+=======
 int LuaScriptInterface::luaPlayerGetIdleTime(lua_State* L)
 {
 	// player:getIdleTime()
@@ -10429,6 +10523,7 @@ int LuaScriptInterface::luaPlayerGetAttackSpeed(lua_State* L)
 	return 1;
 }
 
+>>>>>>> 04a30ef (Market feature added)
 int LuaScriptInterface::luaPlayerGetFightMode(lua_State* L)
 {
 	// player:getFightMode()

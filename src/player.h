@@ -9,7 +9,8 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
@@ -248,12 +249,19 @@ class Player final : public Creature, public Cylinder
 			lastWalkthroughPosition = walkthroughPosition;
 		}
 
+<<<<<<< HEAD
 		Inbox* getInbox() const {
-			if (!inbox) {
-				const_cast<Player*>(this)->inbox = new Inbox(ITEM_INBOX);
-			}
 			return inbox;
 		}
+=======
+		Inbox_ptr getInbox() const
+			{
+				if (!inbox) {
+					const_cast<Player*>(this)->inbox = std::make_shared<Inbox>(ITEM_INBOX);
+				}
+				return inbox;
+			}
+>>>>>>> 04a30ef (Market feature added)
 
 		StoreInbox* getStoreInbox() const {
 			return storeInbox;
@@ -366,12 +374,23 @@ class Player final : public Creature, public Cylinder
 		bool isInMarket() const {
 			return inMarket;
 		}
+<<<<<<< HEAD
+
+		void resetIdleTime() {
+			idleTime = 0;
+		}
+
+		bool isInGhostMode() const override {
+			return ghostMode;
+		}
+=======
 		
 		int32_t getIdleTime() const { return idleTime; }
 		void setIdleTime(int32_t time) { idleTime = time; }
 		void resetIdleTime() { idleTime = 0; }
 		
 		bool isInGhostMode() const override { return ghostMode; }
+>>>>>>> 04a30ef (Market feature added)
 		bool canSeeGhostMode(const Creature* creature) const override;
 		void switchGhostMode() {
 			ghostMode = !ghostMode;
@@ -1012,9 +1031,21 @@ class Player final : public Creature, public Cylinder
 				client->sendCloseShop();
 			}
 		}
+<<<<<<< HEAD
+		void sendMarketEnter(uint32_t depotId) const {
+			if (client) {
+				client->sendMarketEnter(depotId);
+			}
+		}
+		void sendMarketLeave() {
+			inMarket = false;
+			if (client) {
+				client->sendMarketLeave();
+=======
 		void sendMarketEnter() const {
 			if (client) {
 				client->sendMarketEnter();
+>>>>>>> 04a30ef (Market feature added)
 			}
 		}
 		void sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers, const MarketOfferList& sellOffers) const {

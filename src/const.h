@@ -1,7 +1,7 @@
 /**
  * The Forgotten Server - a free and open-source MMORPG server emulator
  * Copyright (C) 2019  Mark Samman <mark.samman@gmail.com>
-
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -20,9 +20,13 @@
 #ifndef FS_CONST_H_0A49B5996F074465BF44B90F4F780E8B
 #define FS_CONST_H_0A49B5996F074465BF44B90F4F780E8B
 
+<<<<<<< HEAD
+static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 24590;
+=======
 static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 65500;
 static constexpr int32_t MIN_MARKET_FEE = 20;
-static constexpr int32_t MAX_MARKET_FEE = 100000;
+ static constexpr int32_t MAX_MARKET_FEE = 10000;
+>>>>>>> 04a30ef (Market feature added)
 
 enum MagicEffectClasses : uint16_t {
 	CONST_ME_NONE,
@@ -511,9 +515,9 @@ enum item_t : uint16_t {
 
 	ITEM_DEPOT = 2594,
 	ITEM_LOCKER1 = 2589,
-	ITEM_INBOX = 5200,
-	ITEM_MARKET = 5201,
-	/*ITEM_STORE_INBOX = 26052,
+	/*ITEM_INBOX = 14404,
+	ITEM_MARKET = 14405,
+	ITEM_STORE_INBOX = 26052,
 	ITEM_DEPOT_BOX_I = 25453,
 	ITEM_DEPOT_BOX_II = 25454,
 	ITEM_DEPOT_BOX_III = 25455,
@@ -611,125 +615,6 @@ enum ReloadTypes_t : uint8_t  {
 	RELOAD_TYPE_SPELLS,
 	RELOAD_TYPE_TALKACTIONS,
 	RELOAD_TYPE_WEAPONS,
-	};
-
-// OTCv8 features (from src/client/const.h)
-enum GameFeature {
-	GameProtocolChecksum = 1,
-	GameAccountNames = 2,
-	GameChallengeOnLogin = 3,
-	GamePenalityOnDeath = 4,
-	GameNameOnNpcTrade = 5,
-	GameDoubleFreeCapacity = 6,
-	GameDoubleExperience = 7,
-	GameTotalCapacity = 8,
-	GameSkillsBase = 9,
-	GamePlayerRegenerationTime = 10,
-	GameChannelPlayerList = 11,
-	GamePlayerMounts = 12,
-	GameEnvironmentEffect = 13,
-	GameCreatureEmblems = 14,
-	GameItemAnimationPhase = 15,
-	GameMagicEffectU16 = 16,
-	GamePlayerMarket = 17,
-	GameSpritesU32 = 18,
-	GameTileAddThingWithStackpos = 19,
-	GameOfflineTrainingTime = 20,
-	GamePurseSlot = 21,
-	GameFormatCreatureName = 22,
-	GameSpellList = 23,
-	GameClientPing = 24,
-	GameExtendedClientPing = 25,
-	GameDoubleHealth = 28,
-	GameDoubleSkills = 29,
-	GameChangeMapAwareRange = 30,
-	GameMapMovePosition = 31,
-	GameAttackSeq = 32,
-	GameBlueNpcNameColor = 33,
-	GameDiagonalAnimatedText = 34,
-	GameLoginPending = 35,
-	GameNewSpeedLaw = 36,
-	GameForceFirstAutoWalkStep = 37,
-	GameMinimapRemove = 38,
-	GameDoubleShopSellAmount = 39,
-	GameContainerPagination = 40,
-	GameThingMarks = 41,
-	GameLooktypeU16 = 42,
-	GamePlayerStamina = 43,
-	GamePlayerAddons = 44,
-	GameMessageStatements = 45,
-	GameMessageLevel = 46,
-	GameNewFluids = 47,
-	GamePlayerStateU16 = 48,
-	GameNewOutfitProtocol = 49,
-	GamePVPMode = 50,
-	GameWritableDate = 51,
-	GameAdditionalVipInfo = 52,
-	GameBaseSkillU16 = 53,
-	GameCreatureIcons = 54,
-	GameHideNpcNames = 55,
-	GameSpritesAlphaChannel = 56,
-	GamePremiumExpiration = 57,
-	GameBrowseField = 58,
-	GameEnhancedAnimations = 59,
-	GameOGLInformation = 60,
-	GameMessageSizeCheck = 61,
-	GamePreviewState = 62,
-	GameLoginPacketEncryption = 63,
-	GameClientVersion = 64,
-	GameContentRevision = 65,
-	GameExperienceBonus = 66,
-	GameAuthenticator = 67,
-	GameUnjustifiedPoints = 68,
-	GameSessionKey = 69,
-	GameDeathType = 70,
-	GameIdleAnimations = 71,
-	GameKeepUnawareTiles = 72,
-	GameIngameStore = 73,
-	GameIngameStoreHighlights = 74,
-	GameIngameStoreServiceType = 75,
-	GameAdditionalSkills = 76,
-	GameDistanceEffectU16 = 77,
-	GamePrey = 78,
-	GameDoubleMagicLevel = 79,
-
-	GameExtendedOpcode = 80,
-	GameMinimapLimitedToSingleFloor = 81,
-	GameSendWorldName = 82,
-
-	GameDoubleLevel = 83,
-	GameDoubleSoul = 84,
-	GameDoublePlayerGoodsMoney = 85,
-	GameCreatureWalkthrough = 86,
-	GameDoubleTradeMoney = 87,
-	GameSequencedPackets = 88,
-	GameTibia12Protocol = 89,
-
-	// 90-99 otclientv8 features
-	GameNewWalking = 90,
-	GameSlowerManualWalking = 91,
-
-	GameItemTooltip = 93,
-
-	GameBot = 95,
-	GameBiggerMapCache = 96,
-	GameForceLight = 97,
-	GameNoDebug = 98,
-	GameBotProtection = 99,
-
-	// Custom features for customer
-	GameFasterAnimations = 101,
-	GameCenteredOutfits = 102,
-	GameSendIdentifiers = 103,
-	GameWingsAndAura = 104,
-	GamePlayerStateU32 = 105,
-	GameOutfitShaders = 106,
-
-	// advanced features
-	GamePacketSizeU32 = 110,
-	GamePacketCompression = 111,
-
-	LastGameFeature = 120
 };
 
 static constexpr int32_t CHANNEL_GUILD = 0x00;
